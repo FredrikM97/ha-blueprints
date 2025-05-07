@@ -1,0 +1,158 @@
+blueprint:
+  name: Tradfri E2001/E2002 light Switch
+  description: >
+    Control light or group of lights with switch.
+    Based on https://gist.github.com/FloppyGit/efaa93c1d63676e30c4b61adb4a861ac
+  domain: automation
+  input:
+    source_switch_action:
+      name: Tradfri E2001/E2002 Switch
+      description: Switch triggers action.
+      selector:
+        entity:
+          filter:
+            - integration: mqtt
+              domain: sensor
+          multiple: false
+    target_light:
+      name: Target Light
+      description: The light/group entity to control.
+      selector:
+        target: {}
+    color_cycle_map:
+      name: Color Temperature Cycle Map
+      description: The list of color temperatures to cycle through.
+      default: [250, 294, 375, 454]
+      selector:
+        entity:
+          multiple: true
+  source_url: https://gist.github.com/FredrikM97/12d2a59038e24b3135aea5691d802bac
+  
+alias: Tradfri E2001/E2002 light switch
+description: ''
+trigger:
+  - platform: state
+    entity_id: !input source_switch_action
+    id: 'on'
+    to: 'on'
+  - platform: state
+    entity_id: !input source_switch_action
+    id: 'off'
+    to: 'off'
+  - platform: state
+    entity_id: !input source_switch_action
+    id: brightness_move_up
+    to: brightness_move_up
+  - platform: state
+    entity_id: !input source_switch_action
+    id: brightness_move_down
+    to: brightness_move_down
+  - platform: state
+    entity_id: !input source_switch_action
+    id: brightness_stop
+    to: brightness_stop
+  - platform: state
+    entity_id: !input source_switch_action
+    id: arrow_left_click
+    to: arrow_left_click
+  - platform: state
+    entity_id: !input source_switch_action
+    id: arrow_right_click
+    to: arrow_right_click
+
+condition: []
+
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: 'on'
+        sequence:
+          - service: light.turn_on
+            data: {}
+            target: !input target_light
+      - conditions:
+          - condition: trigger
+            id: 'off'
+        sequence:
+          - service: light.turn_off
+            data: {}
+            target: !input target_light
+      - conditions:
+          - condition: trigger
+            id: brightness_move_up
+        sequence:
+          - repeat:
+              sequence:
+                - service: light.turn_on
+                  data:
+                    brightness_step_pct: 5
+                    transition: 0.2
+                  target: !input target_light
+                - delay:
+                    hours: 0
+                    minutes: 0
+                    seconds: 0
+                    milliseconds: 100
+              count: 50
+      - conditions:
+          - condition: trigger
+            id: brightness_move_down
+        sequence:
+          - repeat:
+              sequence:
+                - service: light.turn_on
+                  data:
+                    brightness_step_pct: -5
+                    transition: 0.2
+                  target: !input target_light
+                - delay:
+                    hours: 0
+                    minutes: 0
+                    seconds: 0
+                    milliseconds: 100
+              count: 50
+      - conditions:
+          - condition: trigger
+            id: arrow_left_click
+        sequence:
+          - variables:
+              light_state: !input target_light
+              current_temp: >
+                {{ state_attr(light_state.entity_id, 'color_temp') }}
+              cycle_map: !input color_cycle_map
+              next_temp: >
+                {{ cycle_map[(cycle_map.index(current_temp) + -1) % cycle_map|length] if current_temp in cycle_map else 375 }}
+          - service: light.turn_on
+            target: !input target_light
+            data:
+              transition: 1
+              color_temp: "{{ next_temp }}"
+          - service: persistent_notification.create
+            data:
+              message: "New color temperature for {{ target_light.entity_id }}: {{ next_temp }}"
+              title: Light Color Temp Updated
+            enabled: false
+      - conditions:
+          - condition: trigger
+            id: arrow_right_click
+        sequence:
+          - variables:
+              light_state: !input target_light
+              current_temp: >
+                {{ state_attr(light_state.entity_id, 'color_temp') }}
+              cycle_map: !input color_cycle_map
+              next_temp: >
+                {{ cycle_map[(cycle_map.index(current_temp) + 1) % cycle_map|length] if current_temp in cycle_map else 375 }}
+          - service: light.turn_on
+            target: !input target_light
+            data:
+              transition: 1
+              color_temp: "{{ next_temp }}"
+          - service: persistent_notification.create
+            data:
+              message: "New color temperature for {{ target_light.entity_id }}: {{ next_temp }}"
+              title: Light Color Temp Updated
+            enabled: false
+
+mode: restart
