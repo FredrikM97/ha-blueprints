@@ -1,0 +1,43 @@
+alias: Automation Schedule timer
+description: "Automation to control entities for when to turn on and off. Defaults to turn on at dusk."
+mode: single
+triggers:
+  - trigger: sun
+    event: sunset
+    id: sunset_trigger
+  - trigger: time
+    at: null
+    id: custom_time_trigger
+  - trigger: time
+    at: "00:00:00"
+    id: turn_off_trigger
+actions:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ trigger.id in ['sunset_trigger', 'custom_time_trigger'] or (
+              trigger.id == 'manual_trigger') }}
+        sequence:
+          - target:
+              entity_id:
+                - light.hallway_light
+                - light.kitchen_window_lamp
+                - light.living_room_fan
+                - light.balcony_light_strip
+            action: light.turn_on
+            data: {}
+      - conditions:
+          - condition: template
+            value_template: >
+              {{ trigger.id in ['turn_off_trigger'] or (trigger.id ==
+              'manual_trigger') }}
+        sequence:
+          - target:
+              entity_id:
+                - light.hallway_light
+                - light.kitchen_window_lamp
+                - light.living_room_fan
+                - light.balcony_light_strip
+            action: light.turn_off
+            data: {}
