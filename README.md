@@ -13,3 +13,7 @@ Delay startup of addon instead of automatic startup at HA boot.
 ## Tradfri E2001-E2002 light switch.yaml
 Control Trådfri buttons for E2001-E2002 and enable cycle through a list of color templates defined in the automation.
 ![image](https://github.com/user-attachments/assets/571e7b0d-d740-4120-98ca-0eb435cbaab5)
+
+## Smartplug with laptop powercontrol external displays
+Turn on smartplug when laptop is connected to usb-c with power and external display and disable power when usb-c is disconnected.
+![image](https://github.com/user-attachments/assets/d28b26c6-1260-40d0-912b-9a6a8d8c55ac)
