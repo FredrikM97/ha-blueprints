@@ -1,0 +1,17 @@
+alias: Addon HA startup
+description: "Startup for home assistant to delay a specific addon"
+variables:
+  delay: 600
+  addon_slugs: 45df7312_zigbee2mqtt
+mode: single
+triggers:
+  - event_type: homeassistant.start
+    trigger: event
+conditions: []
+actions:
+  - delay:
+      seconds: "{{ delay }}"
+  - data:
+      addon: "{{ addon_slugs }}"
+    action: hassio.addon_start
+
