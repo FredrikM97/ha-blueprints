@@ -1,19 +1,15 @@
 blueprint:
   name: Tradfri E2001/E2002 light Switch
   description: >
-    Control light or group of lights with switch.
-    Based on https://gist.github.com/FloppyGit/efaa93c1d63676e30c4b61adb4a861ac
+    Control light or group of lights with a Tradfri E2001/E2002 remote.
   domain: automation
   input:
     source_switch_action:
       name: Tradfri E2001/E2002 Switch
       description: Switch triggers action.
       selector:
-        entity:
-          filter:
-            - integration: mqtt
-              domain: sensor
-          multiple: false
+        device:
+          integration: mqtt  # This filters for MQTT devices
     target_light:
       name: Target Light
       description: The light/group entity to control.
@@ -27,38 +23,46 @@ blueprint:
         entity:
           multiple: true
   source_url: https://gist.github.com/FredrikM97/12d2a59038e24b3135aea5691d802bac
-  
+
 alias: Tradfri E2001/E2002 light switch
 description: ''
 trigger:
-  - platform: state
-    entity_id: !input source_switch_action
-    id: 'on'
-    to: 'on'
-  - platform: state
-    entity_id: !input source_switch_action
-    id: 'off'
-    to: 'off'
-  - platform: state
-    entity_id: !input source_switch_action
+  - platform: device
+    device_id: !input source_switch_action
+    domain: mqtt
+    type: action
+    subtype: "on"
+    id: "on"
+  - platform: device
+    device_id: !input source_switch_action
+    domain: mqtt
+    type: action
+    subtype: "off"
+    id: "off"
+  - platform: device
+    device_id: !input source_switch_action
+    domain: mqtt
+    type: action
+    subtype: brightness_move_up
     id: brightness_move_up
-    to: brightness_move_up
-  - platform: state
-    entity_id: !input source_switch_action
+  - platform: device
+    device_id: !input source_switch_action
+    domain: mqtt
+    type: action
+    subtype: brightness_move_down
     id: brightness_move_down
-    to: brightness_move_down
-  - platform: state
-    entity_id: !input source_switch_action
-    id: brightness_stop
-    to: brightness_stop
-  - platform: state
-    entity_id: !input source_switch_action
+  - platform: device
+    device_id: !input source_switch_action
+    domain: mqtt
+    type: action
+    subtype: arrow_left_click
     id: arrow_left_click
-    to: arrow_left_click
-  - platform: state
-    entity_id: !input source_switch_action
+  - platform: device
+    device_id: !input source_switch_action
+    domain: mqtt
+    type: action
+    subtype: arrow_right_click
     id: arrow_right_click
-    to: arrow_right_click
 
 condition: []
 
