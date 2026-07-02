@@ -1,0 +1,142 @@
+blueprint:
+  name: Zigbee2MQTT - Moes 4-Button Switch
+  description: >
+    Controls entities based on Zigbee2MQTT action payloads using MQTT wildcard topic.
+
+  domain: automation
+
+  input:
+    switch_device:
+      name: Zigbee2MQTT Device (reference only)
+      selector:
+        device:
+          integration: mqtt
+
+    single_1:
+      name: Button 1 - Single Press
+      default: []
+      selector:
+        action: {}
+
+    single_2:
+      default: []
+      selector:
+        action: {}
+
+    single_3:
+      default: []
+      selector:
+        action: {}
+
+    single_4:
+      default: []
+      selector:
+        action: {}
+
+    double_1:
+      default: []
+      selector:
+        action: {}
+
+    double_2:
+      default: []
+      selector:
+        action: {}
+
+    double_3:
+      default: []
+      selector:
+        action: {}
+
+    double_4:
+      default: []
+      selector:
+        action: {}
+
+    hold_1:
+      default: []
+      selector:
+        action: {}
+
+    hold_2:
+      default: []
+      selector:
+        action: {}
+
+    hold_3:
+      default: []
+      selector:
+        action: {}
+
+    hold_4:
+      default: []
+      selector:
+        action: {}
+
+trigger:
+  - platform: mqtt
+    topic: zigbee2mqtt/+/action
+
+action:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == '1_single' }}"
+        sequence: !input single_1
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == '2_single' }}"
+        sequence: !input single_2
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == '3_single' }}"
+        sequence: !input single_3
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == '4_single' }}"
+        sequence: !input single_4
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == '1_double' }}"
+        sequence: !input double_1
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == '2_double' }}"
+        sequence: !input double_2
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == '3_double' }}"
+        sequence: !input double_3
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == '4_double' }}"
+        sequence: !input double_4
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == '1_hold' }}"
+        sequence: !input hold_1
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == '2_hold' }}"
+        sequence: !input hold_2
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == '3_hold' }}"
+        sequence: !input hold_3
+
+      - conditions:
+          - condition: template
+            value_template: "{{ trigger.payload == '4_hold' }}"
+        sequence: !input hold_4
+
+mode: queued
