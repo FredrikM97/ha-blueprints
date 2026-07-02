@@ -102,6 +102,7 @@ trigger:
         - 2_hold
         - 3_hold
         - 4_hold
+        - hold # Fix to handle the hold witZ button
         
 variables:
   action: "{{ trigger.to_state.attributes.event_type }}"
@@ -150,22 +151,22 @@ action:
 
       - conditions:
           - condition: template
-            value_template: "{{ action == '1_hold' }}"
+            value_template: "{{ action == 'hold' and trigger.to_state.attributes.button == '1'}}"
         sequence: !input hold_1
 
       - conditions:
           - condition: template
-            value_template: "{{ action == '2_hold' }}"
+            value_template: "{{ action == 'hold' and trigger.to_state.attributes.button == '2' }}"
         sequence: !input hold_2
 
       - conditions:
           - condition: template
-            value_template: "{{ action == '3_hold' }}"
+            value_template: "{{ action == 'hold' and trigger.to_state.attributes.button == '3' }}"
         sequence: !input hold_3
 
       - conditions:
           - condition: template
-            value_template: "{{ action == '4_hold' }}"
+            value_template: "{{ action == 'hold' and trigger.to_state.attributes.button == '4' }}"
         sequence: !input hold_4
 
 mode: queued
